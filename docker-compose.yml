@@ -1,0 +1,24 @@
+services:
+  salesdesk:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - salesdesk-data:/data
+    ports:
+      - "127.0.0.1:8080:8080"   # expose publicly only through the TLS reverse proxy below
+    stop_grace_period: 30s
+
+  # Optional: automatic HTTPS (needed for the Mini App button). Edit deploy/Caddyfile first.
+  caddy:
+    image: caddy:2
+    profiles: ["https"]
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+
+volumes:
+  salesdesk-data:
+  caddy-data:

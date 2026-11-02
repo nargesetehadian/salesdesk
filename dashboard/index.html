@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>میزکار فروش</title>
+<script src="https://tapi.bale.ai/miniapp.js?3" async onerror="void 0"></script>
+<style>
+:root{
+  --bg:#eef1f6; --surface:#fff; --ink:#142036; --muted:#63708a; --line:#e2e7f0;
+  --brand:#2b59e6; --brand-soft:#e7edff; --warn:#c8400d; --warn-soft:#fff0e8; --ok:#14804f;
+  --radius:14px;
+  font-family:"Vazirmatn","Vazir","IRANSansX","Segoe UI",Tahoma,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0e1524; --surface:#162036; --ink:#e8edf8; --muted:#92a0bc; --line:#25304a;
+  --brand:#7c9bff; --brand-soft:#1f2c50; --warn:#ff8a5c; --warn-soft:#33221d; --ok:#4cc58d;
+}}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);line-height:1.7;font-size:15px;padding:clamp(14px,3vw,32px)}
+.wrap{max-width:1120px;margin-inline:auto;display:grid;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+h1{font-size:clamp(22px,3.4vw,30px);font-weight:800;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:14px}
+.tools{display:flex;align-items:center;gap:10px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:4px 12px;border-radius:99px;background:var(--surface);border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.chip.demo .dot{background:var(--warn)}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 14px;border-radius:99px}
+a.btn{font:inherit;text-decoration:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 14px;border-radius:99px;font-size:14px}
+a.btn:hover{border-color:var(--brand)}
+button:hover{border-color:var(--brand)}
+:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.panel h2{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h2 small{font-weight:400;color:var(--muted);font-size:13px}
+/* KPI strip: one surface, divided, not four separate cards */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);padding:0;overflow:hidden}
+.kpi{padding:20px 22px;border-inline-start:1px solid var(--line)}
+.kpi:first-child{border-inline-start:0}
+.kpi b{display:block;font-size:clamp(28px,4vw,40px);font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}
+.kpi span{color:var(--muted);font-size:14px}
+.kpi.alert{background:var(--warn-soft)} .kpi.alert b{color:var(--warn)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.c7{grid-column:span 7}.c5{grid-column:span 5}.c12{grid-column:1/-1}
+/* performance */
+.seg{display:inline-flex;gap:4px;padding:3px;border-radius:99px;background:var(--bg)}
+.seg button{border:0;background:transparent;padding:4px 14px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--surface);color:var(--ink);font-weight:700;box-shadow:0 1px 3px #0002}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);margin:0 -20px 18px;border-block:1px solid var(--line)}
+.metric{padding:14px 20px;border-inline-start:1px solid var(--line)}.metric:first-child{border-inline-start:0}
+.metric b{display:block;font-size:26px;font-weight:800;line-height:1.3}.metric span{color:var(--muted);font-size:13px}
+.delta{font-size:12px;font-weight:700;margin-inline-start:6px}.delta.up{color:var(--ok)}.delta.down{color:var(--warn)}.delta.flat{color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-bottom:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:6px}
+svg.chart{width:100%;height:auto;display:block}
+.tablewrap{overflow-x:auto;margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+th,td{padding:10px 8px;text-align:center;border-top:1px solid var(--line)}
+th{color:var(--muted);font-weight:500;font-size:13px;border-top:0}
+th:first-child,td:first-child{text-align:start;font-weight:600}
+td.best{color:var(--brand);font-weight:800}td.late{color:var(--warn);font-weight:700}
+/* funnel */
+.stage{display:grid;grid-template-columns:110px 1fr 56px;align-items:center;gap:12px;margin-block:10px}
+.stage .bar{height:34px;background:var(--brand-soft);border-radius:10px;overflow:hidden}
+.stage .fill{height:100%;background:var(--brand);border-radius:10px;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.stage:last-child .fill{background:var(--ok)}
+.stage .n{font-weight:700;font-variant-numeric:tabular-nums}
+.stage .pct{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+/* meetings */
+.day{color:var(--muted);font-size:13px;margin:14px 0 6px}.day:first-of-type{margin-top:0}
+.row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.time{min-width:52px;font-weight:700;color:var(--brand);font-variant-numeric:tabular-nums}
+.who{flex:1;min-width:0}.who b{display:block;font-weight:600}.who span{color:var(--muted);font-size:13px}
+.av{width:38px;height:38px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-weight:700}
+.badge{padding:2px 10px;border-radius:99px;font-size:13px;font-weight:700;background:var(--warn-soft);color:var(--warn);white-space:nowrap}
+.badge.hot{background:var(--warn);color:#fff}
+a.call{color:var(--brand);text-decoration:none;font-size:13px;direction:ltr;unicode-bidi:embed}
+a.call:hover{text-decoration:underline}
+/* trend */
+.trend{display:flex;align-items:flex-end;gap:10px;height:150px}
+.trend div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%;font-size:12px;color:var(--muted)}
+.trend i{display:block;width:100%;max-width:34px;background:var(--brand);border-radius:8px 8px 3px 3px;min-height:4px}
+.empty{color:var(--muted);padding:18px 0;text-align:center}
+@media (max-width:860px){
+  .kpis{grid-template-columns:1fr 1fr}.kpi:nth-child(3){border-inline-start:0}
+  .kpi:nth-child(n+3){border-top:1px solid var(--line)}
+  .metrics{grid-template-columns:repeat(2,1fr)}.metric:nth-child(odd){border-inline-start:0}.metric:nth-child(n+3){border-top:1px solid var(--line)}
+  .c7,.c5{grid-column:1/-1}.stage{grid-template-columns:84px 1fr 48px}
+}
+@media (prefers-reduced-motion:reduce){.stage .fill{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>میزکار فروش</h1><p class="sub" id="today"></p></div>
+    <div class="tools"><span class="chip" id="state"><i class="dot"></i><span id="stateText">در حال بارگذاری</span></span>
+      <a class="btn" id="xlsx" href="/export/leads.xlsx">اکسل</a><a class="btn" id="csv" href="/export/leads.csv">CSV</a>
+      <button id="refresh" type="button">به‌روزرسانی</button></div>
+  </header>
+
+  <section class="panel kpis" aria-label="شاخص‌های کلیدی" id="kpis"></section>
+
+  <section class="panel" id="perf" aria-label="عملکرد تیم">
+    <h2>عملکرد تیم
+      <span class="seg" id="range" role="group" aria-label="بازه‌ی زمانی">
+        <button type="button" data-r="today">امروز</button><button type="button" data-r="7d">۷ روز</button>
+        <button type="button" data-r="30d">۳۰ روز</button><button type="button" data-r="90d">۹۰ روز</button></span></h2>
+    <div class="metrics" id="metrics"></div>
+    <div class="legend" id="legend"></div><div id="chart"></div>
+    <div class="tablewrap"><table id="team"></table></div>
+  </section>
+
+  <div class="grid">
+    <section class="panel c7"><h2>قیف فروش <small>تعداد مشتری‌هایی که به هر مرحله رسیده‌اند</small></h2><div id="funnel"></div></section>
+    <section class="panel c5"><h2>قرارهای ۷ روز آینده</h2><div id="meetings"></div></section>
+    <section class="panel c12"><h2 id="staleTitle">نیازمند پیگیری</h2><div id="stale"></div></section>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const nf = new Intl.NumberFormat('fa-IR');
+const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const STAGES = {new:'جدید', contacted:'تماس گرفته‌شده', meeting:'قرار ملاقات', proposal:'پیشنهاد', won:'فروش موفق'};
+let data, demo = false, animated = false, range = '30d';
+const KEY = new URLSearchParams(location.search).get('key');
+const SERIES = [['leads', 'مشتری جدید', 'var(--brand)'], ['calls', 'تماس', '#9b5de5'], ['meetings', 'قرار', 'var(--warn)'], ['won', 'فروش', 'var(--ok)']];
+const METRIC_LABELS = {leads:'مشتری جدید', calls:'تماس', meetings:'قرار', won:'فروش موفق', tasks_done:'کار انجام‌شده'};
+
+const fmt = (opts, tz) => new Intl.DateTimeFormat('fa-IR-u-ca-persian', {...opts, timeZone: tz});
+
+/* Sample data so the page can be demoed straight from the file, without the backend. */
+function demoData() {
+  const now = Date.now(), H = 36e5, D = 24 * H, at = (d, h) => new Date(now + d * D + (h - 12) * H).toISOString();
+  const days = {today: 1, '7d': 7, '30d': 30, '90d': 90}[range], step = days > 31 ? 7 : 1, n = Math.ceil(days / step);
+  const wave = (i, a, b) => Math.max(0, Math.round(a + b * Math.sin(i * 1.7 + a)));
+  const series = Array.from({length: n}, (_, i) => ({date: new Date(now - (n - 1 - i) * step * D).toISOString().slice(0, 10),
+    leads: wave(i, 2, 1.5) * step, calls: wave(i, 5, 2.5) * step, meetings: wave(i, 2, 1.2) * step, won: i % 4 === 0 ? step : 0}));
+  const sum = (k) => series.reduce((a, r) => a + r[k], 0);
+  const totals = Object.fromEntries(['leads', 'calls', 'meetings', 'won', 'tasks_done'].map((k, j) =>
+    [k, {value: k === 'tasks_done' ? Math.round(sum('calls') / 3) : sum(k), prev: Math.round((k === 'tasks_done' ? sum('calls') / 3 : sum(k)) * (j % 2 ? 0.85 : 1.2))}]));
+  const person = (name, f) => ({name, leads: Math.round(totals.leads.value * f), calls: Math.round(totals.calls.value * f), meetings: Math.round(totals.meetings.value * f),
+    won: Math.round(totals.won.value * f), tasks_done: Math.round(totals.tasks_done.value * f), tasks_open: 9, tasks_overdue: f > .5 ? 1 : 4});
+  return {
+    performance: {range, days, totals, series, team: [person('سارا محمدی', .55), person('علی کریمی', .45)]},
+    timezone: 'Asia/Tehran', stale_days: 10,
+    kpis: {open_leads: 23, meetings_today: 3, meetings_week: 7, stale: 5, won: 3},
+    funnel: [26, 21, 13, 7, 3].map((count, i) => ({stage: Object.keys(STAGES)[i], count})),
+    trend: [2, 4, 1, 5, 3, 6, 2].map((count, i) => ({date: new Date(now - (6 - i) * D).toISOString(), count})),
+    meetings: [['رضایی','نوین‌تک',0,10],['کریمی','آسمان صنعت',0,13],['موسوی','پارس ارتباط',0,16],['احمدی','دیجی‌پیشرو',1,11],
+               ['نجفی','البرز گستر',2,9],['صادقی','آرمان داده',3,14],['فتحی','سپهر نرم',5,10]].map(([name, company, d, h], id) => ({id, name, company, at: at(d, h)})),
+    stale: [['حسینی','نوین‌تک','09121234567',24],['قاسمی','پارس ارتباط','09351112233',17],['جعفری','آرمان داده','09123334455',14],
+            ['مرادی','سپهر نرم','09127778899',12],['یوسفی','البرز گستر','09361230000',11]].map(([name, company, phone, days], id) => ({id, name, company, phone, days})),
+  };
+}
+
+function renderPerformance(p, tz) {
+  document.querySelectorAll('#range button').forEach((b) => b.setAttribute('aria-pressed', b.dataset.r === p.range));
+  $('#metrics').innerHTML = Object.entries(METRIC_LABELS).map(([key, label]) => {
+    const {value, prev} = p.totals[key];
+    const pct = prev ? Math.round((value - prev) / prev * 100) : null;
+    const cls = pct === null || pct === 0 ? 'flat' : pct > 0 ? 'up' : 'down';
+    const txt = pct === null ? (value ? 'جدید' : '—') : (pct > 0 ? '▲ ' : pct < 0 ? '▼ ' : '') + nf.format(Math.abs(pct)) + '٪';
+    return `<div class="metric"><b>${nf.format(value)}<span class="delta ${cls}" title="نسبت به دوره‌ی قبل">${txt}</span></b><span>${label}</span></div>`;
+  }).join('');
+  $('#legend').innerHTML = SERIES.map(([, label, color]) => `<span><i style="background:${color}"></i>${label}</span>`).join('');
+  $('#chart').innerHTML = chartSvg(p, tz);
+  const cols = ['leads', 'calls', 'meetings', 'won', 'tasks_done'];
+  const best = Object.fromEntries(cols.map((c) => [c, Math.max(...p.team.map((t) => t[c]))]));
+  $('#team').innerHTML = '<thead><tr><th>کارمند</th>' + cols.map((c) => `<th>${METRIC_LABELS[c]}</th>`).join('') + '<th>کار باز</th><th>عقب‌افتاده</th></tr></thead><tbody>' +
+    (p.team.map((t) => `<tr><td>${esc(t.name)}</td>` + cols.map((c) => `<td class="${t[c] && t[c] === best[c] ? 'best' : ''}">${nf.format(t[c])}</td>`).join('') +
+      `<td>${nf.format(t.tasks_open)}</td><td class="${t.tasks_overdue ? 'late' : ''}">${nf.format(t.tasks_overdue)}</td></tr>`).join('') ||
+      '<tr><td colspan="8" class="empty">هنوز کارمندی ثبت نشده است.</td></tr>') + '</tbody>';
+}
+
+function chartSvg(p, tz) {
+  const W = 640, H = 230, L = 34, R = 10, T = 12, B = 28, n = p.series.length;
+  const max = Math.max(4, ...p.series.flatMap((r) => SERIES.map(([k]) => r[k])));
+  const x = (i) => W - R - (n === 1 ? (W - L - R) / 2 : i * (W - L - R) / (n - 1)); // RTL: oldest on the right
+  const y = (v) => T + (H - T - B) * (1 - v / max);
+  const label = fmt({day: 'numeric', month: 'short'}, tz);
+  const grid = [0, .5, 1].map((f) => `<line x1="${L}" x2="${W - R}" y1="${y(max * f)}" y2="${y(max * f)}" stroke="var(--line)"/><text x="${L - 6}" y="${y(max * f) + 4}" text-anchor="end" font-size="11" fill="var(--muted)">${nf.format(Math.round(max * f))}</text>`).join('');
+  const ticks = [0, Math.floor((n - 1) / 2), n - 1].filter((v, i, a) => a.indexOf(v) === i).map((i) =>
+    `<text x="${x(i)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--muted)">${label.format(new Date(p.series[i].date + 'T12:00:00'))}</text>`).join('');
+  const lines = SERIES.map(([k, name, color]) => {
+    const pts = p.series.map((r, i) => `${x(i)},${y(r[k])}`).join(' ');
+    const dots = p.series.map((r, i) => `<circle cx="${x(i)}" cy="${y(r[k])}" r="${n > 31 ? 3 : 3.5}" fill="${color}"><title>${name}: ${nf.format(r[k])}</title></circle>`).join('');
+    return `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${n <= 31 ? (n > 14 ? '' : dots) : dots}`;
+  }).join('');
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="روند فعالیت‌ها">${grid}${lines}${ticks}</svg>`;
+}
+
+function render(d) {
+  const tz = d.timezone, k = d.kpis;
+  $('#today').textContent = fmt({weekday:'long', day:'numeric', month:'long', year:'numeric'}, tz).format(new Date());
+  $('#kpis').innerHTML = [
+    [k.open_leads, 'مشتری فعال'], [k.meetings_today, 'قرار امروز'],
+    [k.stale, `بدون پیگیری بیش از ${nf.format(d.stale_days)} روز`, k.stale > 0 ? 'alert' : ''], [k.won, 'فروش موفق'],
+  ].map(([n, label, cls = '']) => `<div class="kpi ${cls}"><b>${nf.format(n)}</b><span>${label}</span></div>`).join('');
+
+  const top = Math.max(1, d.funnel[0].count);
+  $('#funnel').innerHTML = d.funnel.map((f, i) => {
+    const prev = i ? d.funnel[i - 1].count : 0;
+    const pct = i && prev ? `<span class="pct">${nf.format(Math.round(f.count / prev * 100))}٪ از مرحله قبل</span>` : '';
+    return `<div class="stage"><span>${STAGES[f.stage]}</span><div class="bar"><div class="fill" data-w="${f.count / top * 100}" style="width:${animated ? f.count / top * 100 : 0}%"></div></div><b class="n">${nf.format(f.count)}${pct}</b></div>`;
+  }).join('');
+  requestAnimationFrame(() => requestAnimationFrame(() =>
+    document.querySelectorAll('.fill').forEach((el) => (el.style.width = el.dataset.w + '%'))));
+  animated = true;
+
+  const dayFmt = fmt({weekday:'long', day:'numeric', month:'long'}, tz), timeFmt = new Intl.DateTimeFormat('fa-IR', {hour:'2-digit', minute:'2-digit', hour12:false, timeZone:tz});
+  const groups = new Map();
+  d.meetings.forEach((m) => { const key = dayFmt.format(new Date(m.at)); (groups.get(key) ?? groups.set(key, []).get(key)).push(m); });
+  $('#meetings').innerHTML = groups.size ? [...groups].map(([day, list]) =>
+    `<p class="day">${day}</p>` + list.map((m) => `<div class="row"><span class="time">${timeFmt.format(new Date(m.at))}</span>
+      <div class="who"><b>${esc(m.name)}</b><span>${esc(m.company)}</span></div></div>`).join('')).join('')
+    : '<p class="empty">قراری برای این هفته ثبت نشده است.</p>';
+
+  $('#staleTitle').innerHTML = `نیازمند پیگیری <small>${nf.format(d.stale.length)} مشتری</small>`;
+  $('#stale').innerHTML = d.stale.length ? [...d.stale].sort((a, b) => b.days - a.days).map((s) =>
+    `<div class="row"><span class="av">${esc(s.name.trim()[0] || '؟')}</span>
+      <div class="who"><b>${esc(s.name)}</b><span>${esc(s.company)}</span></div>
+      ${s.phone ? `<a class="call" href="tel:${esc(s.phone)}">${esc(s.phone)}</a>` : ''}
+      <span class="badge ${s.days >= 20 ? 'hot' : ''}">${nf.format(s.days)} روز</span></div>`).join('')
+    : '<p class="empty">همه‌ی مشتری‌ها به‌موقع پیگیری شده‌اند.</p>';
+
+  renderPerformance(d.performance, tz);
+
+  $('#state').classList.toggle('demo', demo);
+  $('#stateText').textContent = demo ? 'داده‌ی نمونه' : 'زنده، ' + timeFmt.format(new Date());
+}
+
+async function load() {
+  try {
+    const res = await fetch(`/api/summary?range=${range}${KEY ? '&key=' + encodeURIComponent(KEY) : ''}`, {cache: 'no-store'});
+    if (!res.ok) throw new Error(res.status);
+    data = await res.json(); demo = false;
+  } catch { data = demoData(); demo = true; }
+  render(data);
+}
+$('#refresh').addEventListener('click', load);
+if (KEY) for (const id of ['xlsx', 'csv']) $('#' + id).href += '?key=' + encodeURIComponent(KEY);
+window.addEventListener('load', () => { const app = window.Bale?.WebApp; if (app) { app.ready(); app.expand(); } }); // Bale Mini App
+$('#range').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) { range = b.dataset.r; load(); } });
+load(); setInterval(load, 30000);
+</script>
+</body>
+</html>

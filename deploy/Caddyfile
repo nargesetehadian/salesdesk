@@ -1,0 +1,5 @@
+# Replace with your domain; Caddy obtains and renews the certificate automatically.
+sales.example.com {
+    encode gzip
+    reverse_proxy salesdesk:8080
+}
